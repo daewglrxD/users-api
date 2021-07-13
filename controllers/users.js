@@ -1,81 +1,100 @@
 const User = require("../models/users")
 
 const createUser = async (req, res) => {
-    try{
-        await User.create(req.body).then((user) => {
-            res.status(201).send({
-                message: "Created",
-                user: user
+    try {
+        const doc = await User.create(req.body)
+        if (!doc || doc.length === 0) {
+            res.status(409).send({
+                message: "Conflict"
             })
+            return
+        }
+        res.status(201).send({
+            message: "Created",
+            user: doc
         })
-    }
-    catch (error) {
-        res.status(409).send({
-            message: "Conflict"
-        })
+    } catch (error) {
+        res.status(500).send({
+            error: error.name,
+            message: error.message
+        }) 
     }
 }
 
 const getUsers = async (req, res) => {
     try{
-       await User.find({}).then((users) => {
-            res.status(200).send({
-                message: "Found",
-                users: users
+        const docs = await User.find({});
+        if (!docs || docs.length === 0) {
+            res.status(404).send({
+                message: "Not found"
             })
+            return
+        }
+        res.status(200).send({
+            message: "Found",
+            users: docs
         })
-    }
-    catch(error) {
-        res.status(404).send({
-            message: "Not found"
-        })
+    } catch (error) {
+        res.status(500).send({
+            error: error.name,
+            message: error.message
+        }) 
     }
 }
 
 const getUserById = async (req, res) => {
-    try{
-        await User.find({_id: req.params._id}).then((user) => {
-            res.status(200).send({
-                message: "Found",
-                user: user
+    try {
+        const doc = await User.find({_id: req.params._id})
+        if (!doc || doc.length === 0) {
+            res.status(404).send({
+                message: "Not found"
             })
+            return
+        }
+        res.status(200).send({
+            message: "Found",
+            user: doc
         })
-    }
-    catch(error){
-        res.status(404).send({
-            message: "Not found"
-        })
+    } catch (error) {
+        res.status(500).send({
+            error: error.name,
+            message: error.message
+        }) 
     }
 }
 
 const updateUserById = async (req, res) => {
-    try{
-        await User.findOneAndUpdate({_id: req.params._id}, req.body, {new: true}).then((user) => {
-            res.status(201).send({
-                message: "Updated",
-                user: user
-            })
+    try {
+        const doc = await User.findOneAndUpdate({_id: req.params._id}, req.body, {new: true})
+        if (!doc){
+            res.status(400).send({
+                message: "Bad request"
+            })  
+            return 
+        }
+        res.status(201).send({
+            message: "Updated",
+            user: doc
         })
-    }
-    catch(error){
-        res.status(400).send({
-            message: "Bad request"
-        })
+    } catch (error) {
+        res.status(500).send({
+            error: error.name,
+            message: error.message
+        }) 
     }
 }
 
 const deleteUserById = async (req, res) => {
     try {
-        await User.findOneAndDelete({_id: req.params._id}).then(() => {
-            res.status(204).send({
-                message: "Deleted"
-            })
+        await User.findOneAndDelete({_id: req.params._id})
+        res.status(200).send({
+            message: "Deleted"
         })
-    }
-    catch (error) {
-        res.status(400).send({
-            message: "Bad request"
-        })
+    } catch (error) {
+        res.status(500).send({
+            error: error.name,
+            message: error.message
+        }) 
     }
 }
 
