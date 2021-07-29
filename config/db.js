@@ -1,21 +1,27 @@
 const mongoose = require('mongoose')
+const dotenv = require('dotenv')
 
-const MONGOURI = 'mongodb://localhost/test'
+dotenv.config()
+
+const {
+    MONGO_DB_USER,
+    MONGO_DB_PASS,
+    MONGO_URI,
+    MONGO_DB_PORT,
+    MONGO_DB_NAME
+} = process.env
+
+const url = `mongodb://${MONGO_DB_USER}:${MONGO_DB_PASS}@${MONGO_URI}:${MONGO_DB_PORT}/${MONGO_DB_NAME}?authSource=admin`;
 
 const InitiateMongoServer = async () => {
-    try{
-        await mongoose.connect(MONGOURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-            useCreateIndex: true,
-        })
-        console.log("DB on!")
-    }
-    catch(error){
-        console.log(error)
-        throw error
-    }
+    mongoose.connect(url, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+    })
+
+    mongoose.connection.on('error', () => console.error("connection error: "))
+    mongoose.connection.once('open', () => console.log("db on"))
 }
 
 module.exports = InitiateMongoServer

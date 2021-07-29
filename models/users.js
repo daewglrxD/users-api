@@ -34,6 +34,13 @@ const UserSchema = new Schema({
 
 UserSchema.pre('save', async function (next) {
     const user = this
+
+    if (user.isNew){
+        user.firstName = user.firstName.trim()
+        user.lastName = user.lastName.trim()
+        user.email = user.email.toLowerCase().trim()
+    }
+
     try {
         if (!user.isModified('password')){
             return next()

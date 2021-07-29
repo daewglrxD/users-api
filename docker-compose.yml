@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+    app:
+        restart: always
+        build: .
+        command: npm start
+        ports: 
+            - "3000:3000"
+        volumes:
+            - .:/usr/app
+    mongo:
+        image: mongo
+        container_name: db
+        restart: always
+        ports: 
+            - ${MONGO_DB_PORT}:27017
+        environment: 
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USER}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASS}
+            
